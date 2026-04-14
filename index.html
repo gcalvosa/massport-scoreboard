@@ -2,18 +2,26 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1920">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Massport Business Cup 2026 — Scoreboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #000; overflow: hidden;
+    font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+    color: #fff;
+    -webkit-user-select: none; user-select: none;
+    cursor: none;
+  }
+  body.show-cursor { cursor: default; }
 
   /* ── SCREENS ── */
   .screen { display: none; width: 100vw; height: 100vh; position: absolute; inset: 0; }
   .screen.active { display: flex; }
 
-  /* ── BG GRID ── */
+  /* ── BG ── */
   .bg-grid {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background-image:
@@ -27,7 +35,7 @@
     background: radial-gradient(ellipse, rgba(0,220,110,0.07) 0%, transparent 70%);
   }
 
-  /* ── KEYBOARD HINT (hidden during airplay, toggle with K) ── */
+  /* ── KBD HINT ── */
   #kbd-hint {
     display: none;
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -44,6 +52,103 @@
     color: #00dc6e; font-size: 10px; font-weight: 700; letter-spacing: 0.25em;
     padding: 4px 14px; border-radius: 2px;
   }
+
+  /* ── LOGO CIRCLE ── */
+  .logo-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,220,110,0.2), rgba(0,220,110,0.04));
+    border: 1.5px solid rgba(0,220,110,0.25);
+    display: flex; align-items: center; justify-content: center;
+    color: #00dc6e; font-size: 20px; font-weight: 900;
+    letter-spacing: 0.02em; overflow: hidden; flex-shrink: 0;
+    position: relative;
+  }
+  .logo-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+
+  /* ── GOAL ANIMATION ── */
+  @keyframes goalPulse {
+    0%   { transform: scale(1);   text-shadow: 0 0 0 rgba(0,220,110,0); }
+    30%  { transform: scale(1.4); text-shadow: 0 0 60px rgba(0,220,110,0.9), 0 0 120px rgba(0,220,110,0.6); color: #00dc6e; }
+    100% { transform: scale(1);   text-shadow: 0 0 0 rgba(0,220,110,0); color: #fff; }
+  }
+  .goal-pulse { animation: goalPulse 1.2s cubic-bezier(.2,.9,.3,1); }
+
+  @keyframes goalBannerIn {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-8deg); }
+    15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(-2deg); }
+    30%  { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3) rotate(0deg); }
+  }
+  .goal-banner {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 10000; pointer-events: none;
+    font-size: 220px; font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #00dc6e;
+    text-shadow:
+      0 0 40px rgba(0,220,110,0.9),
+      0 0 100px rgba(0,220,110,0.6),
+      0 0 180px rgba(0,220,110,0.3);
+    animation: goalBannerIn 2.2s cubic-bezier(.2,.9,.3,1) forwards;
+  }
+  .goal-banner .sub {
+    display: block; font-size: 28px; letter-spacing: 0.35em;
+    color: rgba(255,255,255,0.7); margin-top: 8px; text-shadow: none;
+  }
+
+  /* Confetti dots */
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+  .confetti {
+    position: fixed; top: 0; width: 10px; height: 14px;
+    z-index: 9998; pointer-events: none;
+    animation: confettiFall 2.4s linear forwards;
+  }
+
+  /* ── WELCOME ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .welcome-el { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
+
+  /* ── SETUP ── */
+  .setup-input, .setup-tanda {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: #fff; font-family: inherit;
+  }
+  .setup-input {
+    padding: 10px 14px; font-size: 14px; width: 100%;
+    font-weight: 600; letter-spacing: 0.03em;
+  }
+  .setup-input:focus { outline: none; border-color: rgba(0,220,110,0.5); }
+  .dropzone {
+    width: 90px; height: 90px; border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-align: center; cursor: pointer;
+    overflow: hidden; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .dropzone:hover { border-color: rgba(0,220,110,0.5); color: #00dc6e; }
+  .dropzone.dragover { border-color: #00dc6e; background: rgba(0,220,110,0.1); transform: scale(1.05); }
+  .dropzone img { width: 100%; height: 100%; object-fit: contain; }
+  .setup-btn {
+    background: #00dc6e; color: #000; border: none;
+    padding: 12px 28px; font-size: 13px; font-weight: 900;
+    letter-spacing: 0.2em; border-radius: 3px; cursor: pointer;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .setup-btn:hover { background: #00ff80; transform: translateY(-1px); }
+  .setup-btn.secondary { background: rgba(255,255,255,0.08); color: #fff; }
+  .setup-btn.secondary:hover { background: rgba(255,255,255,0.14); }
 </style>
 </head>
 <body>
@@ -52,12 +157,62 @@
 <div class="bg-glow"></div>
 
 <!-- ══════════════════════════════════════════ -->
-<!--  SCREEN 1: GAME DISPLAY (1920×1080)       -->
+<!--  SCREEN 0: WELCOME                         -->
 <!-- ══════════════════════════════════════════ -->
-<div id="screen-game" class="screen active" style="
-  flex-direction: column;
-  background: #000;
+<div id="screen-welcome" class="screen active" style="
+  flex-direction: column; align-items: center; justify-content: center;
+  background: #000; gap: 40px; position: relative;
 ">
+  <div class="welcome-el" style="animation-delay: 0s;">
+    <img src="logos/business-cup.jpg" alt="Business Cup"
+      style="height: 220px; border-radius: 12px; box-shadow: 0 0 80px rgba(0,220,110,0.2);"
+      onerror="this.style.display='none'">
+  </div>
+
+  <div class="welcome-el" style="animation-delay: 0.2s; text-align: center;">
+    <div style="color: rgba(255,255,255,0.3); font-size: 14px; font-weight: 700; letter-spacing: 0.4em; margin-bottom: 8px;">
+      BIENVENIDOS A LA
+    </div>
+    <div style="color: #fff; font-size: 72px; font-weight: 900; letter-spacing: 0.05em; line-height: 1;">
+      MASSPORT BUSINESS CUP
+    </div>
+    <div style="color: #00dc6e; font-size: 48px; font-weight: 900; letter-spacing: 0.15em; margin-top: 4px;">
+      2026
+    </div>
+  </div>
+
+  <div class="welcome-el" style="animation-delay: 0.5s; display: flex; align-items: center; gap: 48px; margin-top: 20px;">
+    <img src="logos/massport.png" alt="Massport"
+      style="height: 90px; opacity: 0.9;"
+      onerror="this.style.display='none'">
+    <div style="width: 1px; height: 70px; background: rgba(255,255,255,0.1);"></div>
+    <img src="logos/cos-sports-plaza.jpg" alt="COS Sports Plaza"
+      style="height: 90px; border-radius: 6px; opacity: 0.9;"
+      onerror="this.style.display='none'">
+  </div>
+
+  <div class="welcome-el" style="animation-delay: 0.9s; margin-top: 60px; display: flex; flex-direction: column; gap: 18px; align-items: center;">
+    <div style="color: rgba(255,255,255,0.65); font-size: 15px; font-weight: 700; letter-spacing: 0.25em;">
+      PRESIONA <span style="color:#00dc6e; background:rgba(0,220,110,0.12); padding:4px 14px; border-radius:3px; margin:0 4px;">ESPACIO</span> PARA COMENZAR
+    </div>
+    <div style="color: rgba(255,255,255,0.35); font-size: 13px; font-weight: 600; letter-spacing: 0.2em;">
+      PRESIONA <span style="color:rgba(255,255,255,0.7); background:rgba(255,255,255,0.08); padding:3px 12px; border-radius:3px; margin:0 4px;">S</span> PARA CONFIGURAR TANDAS
+    </div>
+  </div>
+
+  <div class="welcome-el" style="animation-delay: 1.2s; position: absolute; bottom: 40px; display: flex; gap: 40px; color: rgba(255,255,255,0.2); font-size: 11px; font-weight: 600; letter-spacing: 0.2em;">
+    <span>15 ABR – 8 JUN 2026</span>
+    <span>·</span>
+    <span>COS SPORTS PLAZA</span>
+    <span>·</span>
+    <span>MASSPORT507.COM</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  SCREEN 1: GAME DISPLAY                   -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-game" class="screen" style="flex-direction: column; background: #000;">
   <!-- HEADER -->
   <div style="
     display: flex; align-items: center; justify-content: space-between;
@@ -65,15 +220,18 @@
     border-bottom: 1px solid rgba(255,255,255,0.05);
     position: relative; z-index: 1;
   ">
-    <div style="display:flex; align-items:center; gap:14px;">
-      <img src="https://massport507.com/logos/massport-logo.png" alt="Massport"
-        style="height:28px; filter:brightness(0) invert(1); opacity:0.9;"
+    <div style="display:flex; align-items:center; gap:16px;">
+      <img src="logos/massport.png" alt="Massport"
+        style="height:38px; opacity:0.95;"
         onerror="this.style.display='none'">
-      <div style="width:1px;height:22px;background:rgba(255,255,255,0.15);"></div>
+      <div style="width:1px;height:28px;background:rgba(255,255,255,0.15);"></div>
+      <img src="logos/business-cup.jpg" alt="Business Cup"
+        style="height:38px; border-radius:4px; opacity:0.95;"
+        onerror="this.style.display='none'">
+      <div style="width:1px;height:28px;background:rgba(255,255,255,0.15);"></div>
       <span style="color:rgba(255,255,255,0.4);font-size:12px;font-weight:700;letter-spacing:0.2em;">BUSINESS CUP 2026</span>
     </div>
 
-    <!-- HALF + TANDA badges -->
     <div style="display:flex;align-items:center;gap:12px;">
       <span id="tanda-badge" class="tanda-badge">TANDA 1 / 3</span>
       <div style="
@@ -92,15 +250,19 @@
       </div>
     </div>
 
-    <div style="color:rgba(255,255,255,0.18);font-size:10px;font-weight:600;letter-spacing:0.15em;text-align:right;">
-      <div>15 ABR – 8 JUN 2026</div>
-      <div style="color:rgba(255,255,255,0.08);margin-top:2px;">COS SPORTS PLAZA</div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <img src="logos/cos-sports-plaza.jpg" alt="COS Sports Plaza"
+        style="height:38px; border-radius:4px; opacity:0.95;"
+        onerror="this.style.display='none'">
+      <div style="color:rgba(255,255,255,0.22);font-size:10px;font-weight:600;letter-spacing:0.15em;text-align:right;">
+        <div>15 ABR – 8 JUN 2026</div>
+        <div style="color:rgba(255,255,255,0.1);margin-top:2px;">COS SPORTS PLAZA</div>
+      </div>
     </div>
   </div>
 
-  <!-- MAIN: LEFT MATCH | TIMER | RIGHT MATCH -->
+  <!-- MAIN -->
   <div style="flex:1; display:grid; grid-template-columns:1fr 280px 1fr; position:relative; z-index:1;">
-
     <!-- MATCH 1 -->
     <div style="display:flex;align-items:center;justify-content:center;padding:0 36px 0 52px;">
       <div id="match1-card" style="width:100%;max-width:580px;
@@ -111,29 +273,26 @@
           <span style="color:rgba(0,220,110,0.7);font-size:10px;font-weight:700;letter-spacing:0.25em;">CANCHA 1</span>
         </div>
         <div style="display:flex;align-items:center;padding:32px 28px;gap:16px;">
-          <!-- Home -->
-          <div id="m1-home" style="flex:1;display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+          <div id="m1-home" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;">
             <div class="logo-circle" id="m1-home-logo">?</div>
-            <div id="m1-home-name" style="color:rgba(255,255,255,0.65);font-size:15px;font-weight:700;letter-spacing:0.06em;text-align:right;text-transform:uppercase;line-height:1.2;max-width:180px;">EQUIPO A</div>
-            <div id="m1-home-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">0</div>
+            <div id="m1-home-name" style="color:rgba(255,255,255,0.75);font-size:15px;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;max-width:200px;">EQUIPO A</div>
+            <div id="m1-home-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
-          <!-- VS -->
           <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
             <div style="width:1px;height:80px;background:rgba(255,255,255,0.06);"></div>
             <span style="color:rgba(255,255,255,0.1);font-size:10px;font-weight:700;letter-spacing:0.1em;">VS</span>
             <div style="width:1px;height:80px;background:rgba(255,255,255,0.06);"></div>
           </div>
-          <!-- Away -->
-          <div id="m1-away" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:12px;">
+          <div id="m1-away" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;">
             <div class="logo-circle" id="m1-away-logo">?</div>
-            <div id="m1-away-name" style="color:rgba(255,255,255,0.65);font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;line-height:1.2;max-width:180px;">EQUIPO B</div>
-            <div id="m1-away-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">0</div>
+            <div id="m1-away-name" style="color:rgba(255,255,255,0.75);font-size:15px;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;max-width:200px;">EQUIPO B</div>
+            <div id="m1-away-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TIMER CENTER -->
+    <!-- TIMER -->
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
       <div style="width:1px;height:50px;background:linear-gradient(transparent,rgba(0,220,110,0.35));"></div>
       <div id="timer-display" style="
@@ -143,7 +302,6 @@
         text-align:center;
         transition:color 0.5s;
       ">00:00</div>
-      <!-- Progress bar -->
       <div style="width:180px;height:2px;background:rgba(255,255,255,0.06);border-radius:1px;">
         <div id="timer-bar" style="height:100%;width:0%;background:#00dc6e;border-radius:1px;transition:width 0.9s linear,background 0.5s;"></div>
       </div>
@@ -161,23 +319,20 @@
           <span style="color:rgba(0,220,110,0.7);font-size:10px;font-weight:700;letter-spacing:0.25em;">CANCHA 2</span>
         </div>
         <div style="display:flex;align-items:center;padding:32px 28px;gap:16px;">
-          <!-- Home -->
-          <div id="m2-home" style="flex:1;display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+          <div id="m2-home" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;">
             <div class="logo-circle" id="m2-home-logo">?</div>
-            <div id="m2-home-name" style="color:rgba(255,255,255,0.65);font-size:15px;font-weight:700;letter-spacing:0.06em;text-align:right;text-transform:uppercase;line-height:1.2;max-width:180px;">EQUIPO C</div>
-            <div id="m2-home-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">0</div>
+            <div id="m2-home-name" style="color:rgba(255,255,255,0.75);font-size:15px;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;max-width:200px;">EQUIPO C</div>
+            <div id="m2-home-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
-          <!-- VS -->
           <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
             <div style="width:1px;height:80px;background:rgba(255,255,255,0.06);"></div>
             <span style="color:rgba(255,255,255,0.1);font-size:10px;font-weight:700;letter-spacing:0.1em;">VS</span>
             <div style="width:1px;height:80px;background:rgba(255,255,255,0.06);"></div>
           </div>
-          <!-- Away -->
-          <div id="m2-away" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:12px;">
+          <div id="m2-away" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;">
             <div class="logo-circle" id="m2-away-logo">?</div>
-            <div id="m2-away-name" style="color:rgba(255,255,255,0.65);font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;line-height:1.2;max-width:180px;">EQUIPO D</div>
-            <div id="m2-away-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">0</div>
+            <div id="m2-away-name" style="color:rgba(255,255,255,0.75);font-size:15px;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;max-width:200px;">EQUIPO D</div>
+            <div id="m2-away-score" style="font-size:110px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
         </div>
       </div>
@@ -190,175 +345,206 @@
     padding:14px 52px;border-top:1px solid rgba(255,255,255,0.05);
     position:relative;z-index:1;
   ">
-    <span style="color:rgba(255,255,255,0.1);font-size:9px;letter-spacing:0.22em;">MASSPORT507.COM</span>
+    <span style="color:rgba(255,255,255,0.18);font-size:10px;letter-spacing:0.22em;font-weight:700;">MASSPORT507.COM</span>
     <div style="display:flex;gap:28px;">
-      <span style="color:rgba(255,255,255,0.1);font-size:9px;font-weight:700;letter-spacing:0.15em;">BANCO GENERAL</span>
-      <span style="color:rgba(255,255,255,0.1);font-size:9px;font-weight:700;letter-spacing:0.15em;">GLOBAL BANK</span>
-      <span style="color:rgba(255,255,255,0.1);font-size:9px;font-weight:700;letter-spacing:0.15em;">ADIDAS</span>
-      <span style="color:rgba(255,255,255,0.1);font-size:9px;font-weight:700;letter-spacing:0.15em;">KFC</span>
-      <span style="color:rgba(255,255,255,0.1);font-size:9px;font-weight:700;letter-spacing:0.15em;">TOTALENERGIES</span>
+      <span style="color:rgba(255,255,255,0.12);font-size:9px;font-weight:700;letter-spacing:0.15em;">BANCO GENERAL</span>
+      <span style="color:rgba(255,255,255,0.12);font-size:9px;font-weight:700;letter-spacing:0.15em;">GLOBAL BANK</span>
+      <span style="color:rgba(255,255,255,0.12);font-size:9px;font-weight:700;letter-spacing:0.15em;">ADIDAS</span>
+      <span style="color:rgba(255,255,255,0.12);font-size:9px;font-weight:700;letter-spacing:0.15em;">KFC</span>
+      <span style="color:rgba(255,255,255,0.12);font-size:9px;font-weight:700;letter-spacing:0.15em;">TOTALENERGIES</span>
     </div>
-    <span style="color:rgba(255,255,255,0.1);font-size:9px;letter-spacing:0.22em;">@MASSPORT.PTY</span>
+    <span style="color:rgba(255,255,255,0.18);font-size:10px;letter-spacing:0.22em;font-weight:700;">@MASSPORT.PTY</span>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════ -->
-<!--  SCREEN 2: TRANSITION BETWEEN TANDAS      -->
+<!--  SCREEN 2: TRANSITION                      -->
 <!-- ══════════════════════════════════════════ -->
 <div id="screen-transition" class="screen" style="
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:#000;
-  gap:32px;
+  flex-direction:column; align-items:center; justify-content:center;
+  background:#000; gap:32px;
 ">
-  <img src="https://massport507.com/logos/massport-logo.png" alt="Massport"
-    style="height:36px;filter:brightness(0) invert(1);opacity:0.6;"
+  <img src="logos/business-cup.jpg" alt="Business Cup"
+    style="height:120px;border-radius:10px;opacity:0.9;"
     onerror="this.style.display='none'">
 
   <div style="
-    font-size:13px;font-weight:700;color:rgba(0,220,110,0.6);
+    font-size:13px;font-weight:700;color:rgba(0,220,110,0.7);
     letter-spacing:0.35em;text-transform:uppercase;
   ">BUSINESS CUP 2026</div>
 
   <div id="next-tanda-info" style="text-align:center;margin-top:16px;">
-    <div style="color:rgba(255,255,255,0.2);font-size:11px;font-weight:700;letter-spacing:0.25em;margin-bottom:20px;">PRÓXIMA TANDA</div>
-    <div id="next-match1-label" style="color:rgba(255,255,255,0.5);font-size:28px;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;"></div>
-    <div style="color:rgba(255,255,255,0.1);font-size:12px;margin-bottom:20px;">CANCHA 1</div>
-    <div id="next-match2-label" style="color:rgba(255,255,255,0.5);font-size:28px;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;"></div>
-    <div style="color:rgba(255,255,255,0.1);font-size:12px;">CANCHA 2</div>
+    <div style="color:rgba(255,255,255,0.25);font-size:12px;font-weight:700;letter-spacing:0.3em;margin-bottom:24px;">PRÓXIMA TANDA</div>
+    <div id="next-match1-label" style="color:rgba(255,255,255,0.65);font-size:34px;font-weight:700;letter-spacing:0.05em;margin-bottom:6px;"></div>
+    <div style="color:rgba(0,220,110,0.5);font-size:11px;letter-spacing:0.25em;margin-bottom:24px;">CANCHA 1</div>
+    <div id="next-match2-label" style="color:rgba(255,255,255,0.65);font-size:34px;font-weight:700;letter-spacing:0.05em;margin-bottom:6px;"></div>
+    <div style="color:rgba(0,220,110,0.5);font-size:11px;letter-spacing:0.25em;">CANCHA 2</div>
   </div>
 
   <div style="
     margin-top:40px;
-    color:rgba(255,255,255,0.15);font-size:10px;
-    font-weight:700;letter-spacing:0.2em;
+    color:rgba(255,255,255,0.2);font-size:11px;
+    font-weight:700;letter-spacing:0.25em;
   ">
-    PRESIONA <span style="color:rgba(0,220,110,0.5);background:rgba(0,220,110,0.08);padding:2px 8px;border-radius:2px;">N</span> PARA CONTINUAR
+    PRESIONA <span style="color:#00dc6e;background:rgba(0,220,110,0.12);padding:3px 10px;border-radius:3px;">N</span> PARA CONTINUAR
   </div>
 </div>
 
-<!-- KEYBOARD HINT (toggle with K) -->
+<!-- ══════════════════════════════════════════ -->
+<!--  SCREEN 3: SETUP                           -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-setup" class="screen" style="
+  flex-direction:column; background:#000; overflow-y:auto;
+  padding:40px 60px; gap:24px;
+">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <img src="logos/massport.png" style="height:36px;" onerror="this.style.display='none'">
+      <div>
+        <div style="color:#00dc6e;font-size:11px;font-weight:700;letter-spacing:0.3em;">CONFIGURACIÓN</div>
+        <div style="color:#fff;font-size:26px;font-weight:900;letter-spacing:0.03em;margin-top:2px;">TANDAS DE LA JORNADA</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button class="setup-btn secondary" onclick="clearSetup()">LIMPIAR</button>
+      <button class="setup-btn" onclick="saveSetup()">GUARDAR Y VOLVER</button>
+    </div>
+  </div>
+
+  <div style="color:rgba(255,255,255,0.4);font-size:13px;letter-spacing:0.05em;max-width:800px;line-height:1.5;">
+    Arrastrá los logos de cada equipo a los círculos, o hacé click para seleccionar. Los datos se guardan en este navegador — no necesitás subir nada al repositorio.
+  </div>
+
+  <div id="setup-tandas-container" style="display:flex;flex-direction:column;gap:20px;"></div>
+
+  <div style="color:rgba(255,255,255,0.2);font-size:11px;letter-spacing:0.2em;text-align:center;margin-top:16px;">
+    PRESIONÁ <span class="kbd">ESC</span> PARA CANCELAR SIN GUARDAR
+  </div>
+</div>
+
+<!-- KBD HINT -->
 <div id="kbd-hint">
   <div style="color:#00dc6e;font-weight:700;letter-spacing:0.15em;margin-bottom:10px;font-size:11px;">CONTROLES DEL TECLADO</div>
   <div><span class="kbd">ESPACIO</span> Iniciar / Pausar</div>
-  <div><span class="kbd">R</span> Reset timer</div>
-  <div><span class="kbd">H</span> Cambiar tiempo (1° ↔ 2°)</div>
-  <div style="margin-top:6px;"><span class="kbd">Q</span> Gol+ Cancha 1 Local &nbsp;&nbsp; <span class="kbd">W</span> Gol+ Cancha 1 Visitante</div>
-  <div><span class="kbd">A</span> Gol− Cancha 1 Local &nbsp;&nbsp; <span class="kbd">S</span> Gol− Cancha 1 Visitante</div>
-  <div style="margin-top:6px;"><span class="kbd">U</span> Gol+ Cancha 2 Local &nbsp;&nbsp; <span class="kbd">I</span> Gol+ Cancha 2 Visitante</div>
-  <div><span class="kbd">J</span> Gol− Cancha 2 Local &nbsp;&nbsp; <span class="kbd">L</span> Gol− Cancha 2 Visitante</div>
-  <div style="margin-top:6px;"><span class="kbd">N</span> Siguiente tanda &nbsp;&nbsp; <span class="kbd">B</span> Tanda anterior</div>
+  <div><span class="kbd">R</span> Reset timer &nbsp; <span class="kbd">H</span> Cambiar tiempo (1° ↔ 2°)</div>
+  <div style="margin-top:6px;"><span class="kbd">Q</span> Gol+ C1 Local &nbsp; <span class="kbd">W</span> Gol+ C1 Visitante</div>
+  <div><span class="kbd">A</span> Gol− C1 Local &nbsp; <span class="kbd">S</span> Gol− C1 Visitante</div>
+  <div style="margin-top:6px;"><span class="kbd">U</span> Gol+ C2 Local &nbsp; <span class="kbd">I</span> Gol+ C2 Visitante</div>
+  <div><span class="kbd">J</span> Gol− C2 Local &nbsp; <span class="kbd">L</span> Gol− C2 Visitante</div>
+  <div style="margin-top:6px;"><span class="kbd">N</span> Siguiente tanda &nbsp; <span class="kbd">B</span> Tanda anterior</div>
+  <div><span class="kbd">F</span> Pantalla completa &nbsp; <span class="kbd">ESC</span> Volver al inicio</div>
   <div><span class="kbd">K</span> Mostrar/ocultar esta ayuda</div>
 </div>
 
-<style>
-.logo-circle {
-  width: 64px; height: 64px; border-radius: 50%;
-  background: linear-gradient(135deg, rgba(0,220,110,0.2), rgba(0,220,110,0.04));
-  border: 1.5px solid rgba(0,220,110,0.25);
-  display: flex; align-items: center; justify-content: center;
-  color: #00dc6e; font-size: 18px; font-weight: 900;
-  letter-spacing: 0.02em; overflow: hidden; flex-shrink: 0;
-}
-.logo-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-</style>
-
 <script>
 // ══════════════════════════════════════
-// TANDAS — edit here each jornada
+// DEFAULT TANDAS (se sobreescribe con localStorage)
 // ══════════════════════════════════════
-const TANDAS = [
+const DEFAULT_TANDAS = [
   {
-    match1: {
-      home: { name: "EQUIPO A", logo: "" },
-      away: { name: "EQUIPO B", logo: "" }
-    },
-    match2: {
-      home: { name: "EQUIPO C", logo: "" },
-      away: { name: "EQUIPO D", logo: "" }
-    }
+    match1: { home: { name: "EQUIPO A", logo: "" }, away: { name: "EQUIPO B", logo: "" } },
+    match2: { home: { name: "EQUIPO C", logo: "" }, away: { name: "EQUIPO D", logo: "" } }
   },
   {
-    match1: {
-      home: { name: "EQUIPO E", logo: "" },
-      away: { name: "EQUIPO F", logo: "" }
-    },
-    match2: {
-      home: { name: "EQUIPO G", logo: "" },
-      away: { name: "EQUIPO H", logo: "" }
-    }
+    match1: { home: { name: "EQUIPO E", logo: "" }, away: { name: "EQUIPO F", logo: "" } },
+    match2: { home: { name: "EQUIPO G", logo: "" }, away: { name: "EQUIPO H", logo: "" } }
   },
   {
-    match1: {
-      home: { name: "EQUIPO I", logo: "" },
-      away: { name: "EQUIPO J", logo: "" }
-    },
-    match2: {
-      home: { name: "EQUIPO K", logo: "" },
-      away: { name: "EQUIPO L", logo: "" }
-    }
+    match1: { home: { name: "EQUIPO I", logo: "" }, away: { name: "EQUIPO J", logo: "" } },
+    match2: { home: { name: "EQUIPO K", logo: "" }, away: { name: "EQUIPO L", logo: "" } }
   }
 ];
 
-const HALF_DURATION = 25 * 60; // 25 min in seconds
+let TANDAS = loadTandasFromStorage();
 
-// ══ STATE ══
+const HALF_DURATION = 25 * 60;
+
+// STATE
 let currentTanda = 0;
 let seconds = 0;
 let running = false;
 let half = 1;
 let timerInterval = null;
-let currentScreen = "game"; // "game" | "transition"
+let currentScreen = "welcome";
 
-// ══ REFS ══
 const $ = id => document.getElementById(id);
 
+function loadTandasFromStorage() {
+  try {
+    const raw = localStorage.getItem("massport_tandas_v1");
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_TANDAS));
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length !== 3) return JSON.parse(JSON.stringify(DEFAULT_TANDAS));
+    return parsed;
+  } catch { return JSON.parse(JSON.stringify(DEFAULT_TANDAS)); }
+}
+
+function saveTandasToStorage() {
+  localStorage.setItem("massport_tandas_v1", JSON.stringify(TANDAS));
+}
+
 function initials(name) {
-  return name.trim().split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();
+  return (name || "").trim().split(" ").slice(0,2).map(w=>w[0]||"").join("").toUpperCase() || "?";
 }
 
 function setLogoEl(el, logoUrl, name) {
   if (logoUrl) {
-    el.innerHTML = `<img src="${logoUrl}" alt="${name}" onerror="this.parentElement.textContent='${initials(name)}'">`;
+    const img = new Image();
+    img.onload = () => { el.innerHTML = ""; el.appendChild(img); };
+    img.onerror = () => { el.textContent = initials(name); };
+    img.src = logoUrl;
+    img.alt = name;
   } else {
+    el.innerHTML = "";
     el.textContent = initials(name);
   }
 }
 
 function loadTanda(idx) {
   const t = TANDAS[idx];
-  // Match 1
   $("m1-home-name").textContent = t.match1.home.name;
   $("m1-away-name").textContent = t.match1.away.name;
   $("m1-home-score").textContent = "0";
   $("m1-away-score").textContent = "0";
   setLogoEl($("m1-home-logo"), t.match1.home.logo, t.match1.home.name);
   setLogoEl($("m1-away-logo"), t.match1.away.logo, t.match1.away.name);
-  // Match 2
   $("m2-home-name").textContent = t.match2.home.name;
   $("m2-away-name").textContent = t.match2.away.name;
   $("m2-home-score").textContent = "0";
   $("m2-away-score").textContent = "0";
   setLogoEl($("m2-home-logo"), t.match2.home.logo, t.match2.home.name);
   setLogoEl($("m2-away-logo"), t.match2.away.logo, t.match2.away.name);
-  // Tanda badge
   $("tanda-badge").textContent = `TANDA ${idx+1} / ${TANDAS.length}`;
+}
+
+// ══ SCREEN SWITCHING ══
+function showScreen(name) {
+  ["welcome","game","transition","setup"].forEach(s => {
+    $("screen-"+s).classList.toggle("active", s === name);
+  });
+  currentScreen = name;
+  document.body.classList.toggle("show-cursor", name === "setup" || name === "welcome");
 }
 
 function showTransition(nextIdx) {
   const t = TANDAS[nextIdx];
   $("next-match1-label").textContent = `${t.match1.home.name} vs ${t.match1.away.name}`;
   $("next-match2-label").textContent = `${t.match2.home.name} vs ${t.match2.away.name}`;
-  $("screen-game").classList.remove("active");
-  $("screen-transition").classList.add("active");
-  currentScreen = "transition";
+  showScreen("transition");
 }
 
-function showGame() {
-  $("screen-transition").classList.remove("active");
-  $("screen-game").classList.add("active");
-  currentScreen = "game";
+// ══ FULLSCREEN ══
+function requestFullscreen() {
+  const el = document.documentElement;
+  const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (fn) fn.call(el).catch(() => {});
+}
+function exitFullscreenIfAny() {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+function toggleFullscreen() {
+  if (document.fullscreenElement) exitFullscreenIfAny();
+  else requestFullscreen();
 }
 
 // ══ TIMER ══
@@ -367,7 +553,6 @@ function formatTime(s) {
   const sec = (s%60).toString().padStart(2,"0");
   return `${m}:${sec}`;
 }
-
 function updateTimerUI() {
   const done = seconds >= HALF_DURATION;
   const pct = Math.min((seconds / HALF_DURATION) * 100, 100);
@@ -378,11 +563,9 @@ function updateTimerUI() {
     : running ? "0 0 80px rgba(255,255,255,0.06)" : "none";
   $("timer-bar").style.width = pct + "%";
   $("timer-bar").style.background = done ? "#ff4444" : "#00dc6e";
-  // Live dot
   $("live-dot").style.background = running ? "#00dc6e" : "rgba(255,255,255,0.2)";
   $("live-dot").style.boxShadow = running ? "0 0 10px #00dc6e, 0 0 20px rgba(0,220,110,0.4)" : "none";
 }
-
 function startTimer() {
   if (running || seconds >= HALF_DURATION) return;
   running = true;
@@ -397,27 +580,44 @@ function startTimer() {
   }, 1000);
   updateTimerUI();
 }
-
-function pauseTimer() {
-  running = false;
-  clearInterval(timerInterval);
-  updateTimerUI();
-}
-
-function resetTimer() {
-  pauseTimer();
-  seconds = 0;
-  updateTimerUI();
-}
-
-function toggleTimer() {
-  if (running) pauseTimer(); else startTimer();
-}
-
+function pauseTimer() { running = false; clearInterval(timerInterval); updateTimerUI(); }
+function resetTimer() { pauseTimer(); seconds = 0; updateTimerUI(); }
+function toggleTimer() { if (running) pauseTimer(); else startTimer(); }
 function switchHalf() {
   resetTimer();
   half = half === 1 ? 2 : 1;
   $("half-label").textContent = half === 1 ? "PRIMER TIEMPO" : "SEGUNDO TIEMPO";
+}
+
+// ══ GOAL ANIMATION ══
+function spawnConfetti() {
+  const colors = ["#00dc6e","#ffffff","#00ff80","#ffd700"];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay = (Math.random() * 0.4) + "s";
+    c.style.animationDuration = (1.8 + Math.random() * 1.2) + "s";
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3200);
+  }
+}
+function showGoalBanner() {
+  const b = document.createElement("div");
+  b.className = "goal-banner";
+  b.innerHTML = `¡GOL!<span class="sub">MASSPORT BUSINESS CUP</span>`;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 2300);
+}
+function celebrateGoal(scoreElId) {
+  const el = $(scoreElId);
+  el.classList.remove("goal-pulse");
+  void el.offsetWidth;
+  el.classList.add("goal-pulse");
+  showGoalBanner();
+  spawnConfetti();
 }
 
 // ══ SCORE ══
@@ -425,12 +625,15 @@ function addScore(scoreElId, delta) {
   const el = $(scoreElId);
   const val = Math.max(0, parseInt(el.textContent) + delta);
   el.textContent = val;
-  // Flash animation
-  el.style.color = delta > 0 ? "#00dc6e" : "#ff4444";
-  setTimeout(() => el.style.color = "#fff", 400);
+  if (delta > 0) {
+    celebrateGoal(scoreElId);
+  } else {
+    el.style.color = "#ff4444";
+    setTimeout(() => el.style.color = "#fff", 400);
+  }
 }
 
-// ══ NAVIGATION ══
+// ══ NAV ══
 function goNextTanda() {
   if (currentScreen === "game") {
     if (currentTanda < TANDAS.length - 1) {
@@ -442,10 +645,9 @@ function goNextTanda() {
   } else if (currentScreen === "transition") {
     currentTanda++;
     loadTanda(currentTanda);
-    showGame();
+    showScreen("game");
   }
 }
-
 function goPrevTanda() {
   if (currentTanda > 0) {
     resetTimer();
@@ -453,43 +655,158 @@ function goPrevTanda() {
     $("half-label").textContent = "PRIMER TIEMPO";
     currentTanda--;
     loadTanda(currentTanda);
-    if (currentScreen === "transition") showGame();
+    if (currentScreen === "transition") showScreen("game");
   }
+}
+
+// ══ SETUP SCREEN ══
+function renderSetup() {
+  const container = $("setup-tandas-container");
+  container.innerHTML = "";
+  TANDAS.forEach((tanda, tIdx) => {
+    const tandaDiv = document.createElement("div");
+    tandaDiv.className = "setup-tanda";
+    tandaDiv.style.cssText = "padding:22px 28px; border-radius:6px;";
+    tandaDiv.innerHTML = `
+      <div style="color:#00dc6e;font-size:11px;font-weight:700;letter-spacing:0.3em;margin-bottom:16px;">TANDA ${tIdx+1}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        ${["match1","match2"].map((mk, mIdx) => `
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:4px;padding:18px;">
+            <div style="color:rgba(0,220,110,0.7);font-size:10px;font-weight:700;letter-spacing:0.25em;margin-bottom:14px;">CANCHA ${mIdx+1}</div>
+            <div style="display:flex;gap:16px;align-items:center;">
+              ${["home","away"].map(side => `
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;">
+                  <div class="dropzone" data-t="${tIdx}" data-m="${mk}" data-s="${side}">
+                    ${tanda[mk][side].logo
+                      ? `<img src="${tanda[mk][side].logo}">`
+                      : `ARRASTRÁ<br>LOGO`}
+                  </div>
+                  <input class="setup-input" type="text"
+                    value="${(tanda[mk][side].name || "").replace(/"/g,'&quot;')}"
+                    data-t="${tIdx}" data-m="${mk}" data-s="${side}"
+                    placeholder="Nombre equipo">
+                </div>
+                ${side === "home" ? '<div style="color:rgba(255,255,255,0.15);font-size:11px;font-weight:700;">VS</div>' : ''}
+              `).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+    container.appendChild(tandaDiv);
+  });
+  wireSetupInputs();
+  wireDropzones();
+}
+
+function wireSetupInputs() {
+  document.querySelectorAll(".setup-input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const { t, m, s } = e.target.dataset;
+      TANDAS[t][m][s].name = e.target.value;
+    });
+  });
+}
+
+function wireDropzones() {
+  document.querySelectorAll(".dropzone").forEach(dz => {
+    dz.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file"; input.accept = "image/*";
+      input.onchange = e => handleFile(e.target.files[0], dz);
+      input.click();
+    });
+    dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("dragover"); });
+    dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+    dz.addEventListener("drop", e => {
+      e.preventDefault(); dz.classList.remove("dragover");
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f, dz);
+    });
+  });
+}
+
+function handleFile(file, dz) {
+  if (!file || !file.type.startsWith("image/")) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const { t, m, s } = dz.dataset;
+    TANDAS[t][m][s].logo = dataUrl;
+    dz.innerHTML = `<img src="${dataUrl}">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveSetup() {
+  saveTandasToStorage();
+  currentTanda = 0;
+  loadTanda(0);
+  showScreen("welcome");
+}
+
+function clearSetup() {
+  if (!confirm("¿Borrar todas las tandas y volver a los valores por defecto?")) return;
+  TANDAS = JSON.parse(JSON.stringify(DEFAULT_TANDAS));
+  localStorage.removeItem("massport_tandas_v1");
+  renderSetup();
 }
 
 // ══ KEYBOARD ══
 document.addEventListener("keydown", e => {
-  const key = e.key.toLowerCase();
+  // Don't intercept typing in setup inputs
+  if (document.activeElement && document.activeElement.tagName === "INPUT") {
+    if (e.key === "Escape") document.activeElement.blur();
+    return;
+  }
 
-  // Prevent default for space
+  const key = e.key.toLowerCase();
   if (key === " " || e.key === " ") e.preventDefault();
 
+  // Welcome screen
+  if (currentScreen === "welcome") {
+    if (key === " ") {
+      requestFullscreen();
+      loadTanda(currentTanda);
+      updateTimerUI();
+      showScreen("game");
+    } else if (key === "s") {
+      renderSetup();
+      showScreen("setup");
+    }
+    return;
+  }
+
+  // Setup screen
+  if (currentScreen === "setup") {
+    if (e.key === "Escape") {
+      TANDAS = loadTandasFromStorage();
+      showScreen("welcome");
+    }
+    return;
+  }
+
+  // Game / transition screens
   switch(key) {
-    // Timer
     case " ": toggleTimer(); break;
     case "r": resetTimer(); break;
     case "h": switchHalf(); break;
-
-    // Cancha 1 — home: Q/A  away: W/S
     case "q": addScore("m1-home-score",  1); break;
     case "a": addScore("m1-home-score", -1); break;
     case "w": addScore("m1-away-score",  1); break;
     case "s": addScore("m1-away-score", -1); break;
-
-    // Cancha 2 — home: U/J  away: I/L
     case "u": addScore("m2-home-score",  1); break;
     case "j": addScore("m2-home-score", -1); break;
     case "i": addScore("m2-away-score",  1); break;
     case "l": addScore("m2-away-score", -1); break;
-
-    // Navigation
     case "n": goNextTanda(); break;
     case "b": goPrevTanda(); break;
-
-    // Help
-    case "k":
-      $("kbd-hint").classList.toggle("visible");
-      break;
+    case "f": toggleFullscreen(); break;
+    case "k": $("kbd-hint").classList.toggle("visible"); break;
+  }
+  if (e.key === "Escape") {
+    exitFullscreenIfAny();
+    showScreen("welcome");
   }
 });
 
