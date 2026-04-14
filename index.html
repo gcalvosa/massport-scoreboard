@@ -55,15 +55,19 @@
 
   /* ── LOGO CIRCLE ── */
   .logo-circle {
-    width: 72px; height: 72px; border-radius: 50%;
+    width: 104px; height: 104px; border-radius: 50%;
     background: linear-gradient(135deg, rgba(0,220,110,0.2), rgba(0,220,110,0.04));
     border: 1.5px solid rgba(0,220,110,0.25);
     display: flex; align-items: center; justify-content: center;
-    color: #00dc6e; font-size: 20px; font-weight: 900;
+    color: #00dc6e; font-size: 26px; font-weight: 900;
     letter-spacing: 0.02em; overflow: hidden; flex-shrink: 0;
     position: relative;
+    padding: 8px;
   }
-  .logo-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+  .logo-circle.has-image {
+    background: transparent; border: none; padding: 0;
+  }
+  .logo-circle img { width: 100%; height: 100%; object-fit: contain; }
 
   /* ── GOAL ANIMATION ── */
   @keyframes goalPulse {
@@ -129,14 +133,16 @@
   }
   .setup-input:focus { outline: none; border-color: rgba(0,220,110,0.5); }
   .dropzone {
-    width: 90px; height: 90px; border-radius: 50%;
+    width: 110px; height: 110px; border-radius: 50%;
     border: 2px dashed rgba(255,255,255,0.2);
     display: flex; align-items: center; justify-content: center;
     color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 600;
     letter-spacing: 0.1em; text-align: center; cursor: pointer;
     overflow: hidden; flex-shrink: 0;
     transition: all 0.2s;
+    padding: 10px;
   }
+  .dropzone.has-image { padding: 0; border-style: solid; border-color: rgba(255,255,255,0.08); }
   .dropzone:hover { border-color: rgba(0,220,110,0.5); color: #00dc6e; }
   .dropzone.dragover { border-color: #00dc6e; background: rgba(0,220,110,0.1); transform: scale(1.05); }
   .dropzone img { width: 100%; height: 100%; object-fit: contain; }
@@ -406,6 +412,9 @@
 
   <div style="color:rgba(255,255,255,0.4);font-size:13px;letter-spacing:0.05em;max-width:800px;line-height:1.5;">
     Arrastrá los logos de cada equipo a los círculos, o hacé click para seleccionar. Los datos se guardan en este navegador — no necesitás subir nada al repositorio.
+    <span style="display:block;margin-top:8px;color:rgba(0,220,110,0.7);font-size:12px;">
+      Recomendado: PNG cuadrado con fondo transparente, mínimo 200×200px.
+    </span>
   </div>
 
   <div id="setup-tandas-container" style="display:flex;flex-direction:column;gap:20px;"></div>
@@ -483,12 +492,20 @@ function initials(name) {
 function setLogoEl(el, logoUrl, name) {
   if (logoUrl) {
     const img = new Image();
-    img.onload = () => { el.innerHTML = ""; el.appendChild(img); };
-    img.onerror = () => { el.textContent = initials(name); };
+    img.onload = () => {
+      el.innerHTML = "";
+      el.classList.add("has-image");
+      el.appendChild(img);
+    };
+    img.onerror = () => {
+      el.classList.remove("has-image");
+      el.textContent = initials(name);
+    };
     img.src = logoUrl;
     img.alt = name;
   } else {
     el.innerHTML = "";
+    el.classList.remove("has-image");
     el.textContent = initials(name);
   }
 }
@@ -669,7 +686,7 @@ function renderSetup() {
             <div style="display:flex;gap:16px;align-items:center;">
               ${["home","away"].map(side => `
                 <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;">
-                  <div class="dropzone" data-t="${tIdx}" data-m="${mk}" data-s="${side}">
+                  <div class="dropzone ${tanda[mk][side].logo ? 'has-image' : ''}" data-t="${tIdx}" data-m="${mk}" data-s="${side}">
                     ${tanda[mk][side].logo
                       ? `<img src="${tanda[mk][side].logo}">`
                       : `ARRASTRÁ<br>LOGO`}
@@ -726,6 +743,7 @@ function handleFile(file, dz) {
     const dataUrl = e.target.result;
     const { t, m, s } = dz.dataset;
     TANDAS[t][m][s].logo = dataUrl;
+    dz.classList.add("has-image");
     dz.innerHTML = `<img src="${dataUrl}">`;
   };
   reader.readAsDataURL(file);
