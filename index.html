@@ -218,60 +218,20 @@
 <!-- ══════════════════════════════════════════ -->
 <!--  SCREEN 1: GAME DISPLAY                   -->
 <!-- ══════════════════════════════════════════ -->
-<div id="screen-game" class="screen" style="flex-direction: column; background: #000;">
-  <!-- HEADER -->
-  <div style="
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 2vh 72px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    position: relative; z-index: 1;
-  ">
-    <div style="display:flex; align-items:center; gap:16px;">
-      <div style="width:5px;height:2.6vh;background:#00dc6e;border-radius:1px;"></div>
-      <span style="color:rgba(255,255,255,0.75);font-size:1.8vh;font-weight:900;letter-spacing:0.2em;">MASSPORT BUSINESS CUP 2026</span>
-    </div>
+<div id="screen-game" class="screen" style="background: #000;">
+  <!-- FULL HEIGHT GRID — no header, no footer -->
+  <div style="flex:1; display:grid; grid-template-columns:1fr 300px 1fr; align-items:stretch; position:relative; z-index:1; width:100%;">
 
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span id="tanda-badge" class="tanda-badge">TANDA 1 / 3</span>
-      <div style="
-        display:flex; align-items:center; gap:10px;
-        background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
-        padding:8px 24px; border-radius:2px;
-      ">
-        <div id="live-dot" style="
-          width:9px;height:9px;border-radius:50%;
-          background:rgba(255,255,255,0.2);
-          transition: all 0.4s;
-        "></div>
-        <span id="half-label" style="color:rgba(255,255,255,0.55);font-size:1.4vh;font-weight:700;letter-spacing:0.2em;">
-          PRIMER TIEMPO
-        </span>
-      </div>
-    </div>
-
-    <div style="display:flex; align-items:center; gap:16px;">
-      <div style="color:rgba(255,255,255,0.22);font-size:1.2vh;font-weight:600;letter-spacing:0.15em;text-align:right;">
-        <div>15 ABR – 8 JUN 2026</div>
-        <div style="color:rgba(255,255,255,0.1);margin-top:3px;">COS SPORTS PLAZA</div>
-      </div>
-      <img src="logos/massport.png" alt="Massport"
-        style="height:6vh; opacity:0.95;"
-        onerror="this.style.display='none'">
-    </div>
-  </div>
-
-  <!-- MAIN -->
-  <div style="flex:1; display:grid; grid-template-columns:1fr 320px 1fr; align-items:stretch; position:relative; z-index:1;">
     <!-- MATCH 1 -->
-    <div style="display:flex; padding:16px 24px 16px 48px;">
+    <div style="display:flex; padding:2vh 2vh 2vh 3vh;">
       <div id="match1-card" style="flex:1; display:flex; flex-direction:column;
         background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);
         border-radius:6px;overflow:hidden;">
-        <div style="padding:1.8vh 32px;background:rgba(0,220,110,0.06);border-bottom:1px solid rgba(0,220,110,0.1);display:flex;align-items:center;gap:10px;">
-          <div style="width:5px;height:2vh;background:#00dc6e;border-radius:1px;"></div>
+        <div style="padding:1.5vh 28px;background:rgba(0,220,110,0.06);border-bottom:1px solid rgba(0,220,110,0.1);display:flex;align-items:center;gap:10px;">
+          <div style="width:4px;height:1.8vh;background:#00dc6e;border-radius:1px;"></div>
           <span style="color:rgba(0,220,110,0.7);font-size:1.4vh;font-weight:700;letter-spacing:0.25em;">CANCHA 1</span>
         </div>
-        <div style="flex:1;display:flex;align-items:stretch;padding:2vh 40px 5vh;gap:16px;">
+        <div style="flex:1;display:flex;align-items:stretch;padding:1vh 32px 2vh;gap:12px;">
           <div id="m1-home" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;">
             <div class="logo-circle" id="m1-home-logo">?</div>
             <div id="m1-home-name" style="color:rgba(255,255,255,0.8);font-size:2.4vh;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;">EQUIPO A</div>
@@ -291,11 +251,19 @@
       </div>
     </div>
 
-    <!-- TIMER -->
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:3vh 0;">
+    <!-- TIMER + branding -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:2vh 0;">
+      <div style="color:rgba(255,255,255,0.4);font-size:1.1vh;font-weight:700;letter-spacing:0.3em;">MASSPORT BUSINESS CUP 2026</div>
       <img src="logos/business-cup.jpg" alt="Business Cup"
-        style="height:22vh;border-radius:12px;opacity:0.95;box-shadow:0 0 50px rgba(0,220,110,0.15);"
+        style="height:20vh;border-radius:10px;opacity:0.95;box-shadow:0 0 50px rgba(0,220,110,0.15);"
         onerror="this.style.display='none'">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:1vh;">
+        <span id="tanda-badge" class="tanda-badge">TANDA 1 / 3</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="live-dot" style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.4s;"></div>
+          <span id="half-label" style="color:rgba(255,255,255,0.45);font-size:1.3vh;font-weight:700;letter-spacing:0.2em;">PRIMER TIEMPO</span>
+        </div>
+      </div>
       <div id="timer-display" style="
         font-size:17vh;font-weight:900;color:#fff;
         line-height:1;letter-spacing:0.06em;
@@ -306,22 +274,22 @@
       <div style="width:80%;height:2px;background:rgba(255,255,255,0.06);border-radius:1px;">
         <div id="timer-bar" style="height:100%;width:0%;background:#00dc6e;border-radius:1px;transition:width 0.9s linear,background 0.5s;"></div>
       </div>
-      <div style="color:rgba(255,255,255,0.15);font-size:1.3vh;font-weight:700;letter-spacing:0.2em;">SIMULTÁNEO</div>
       <img src="logos/massport.png" alt="Massport"
         style="height:8vh;opacity:0.9;"
         onerror="this.style.display='none'">
+      <div style="color:rgba(255,255,255,0.12);font-size:1vh;font-weight:700;letter-spacing:0.2em;">MASSPORT507.COM</div>
     </div>
 
     <!-- MATCH 2 -->
-    <div style="display:flex; padding:16px 48px 16px 24px;">
+    <div style="display:flex; padding:2vh 3vh 2vh 2vh;">
       <div id="match2-card" style="flex:1; display:flex; flex-direction:column;
         background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);
         border-radius:6px;overflow:hidden;">
-        <div style="padding:1.8vh 32px;background:rgba(0,220,110,0.06);border-bottom:1px solid rgba(0,220,110,0.1);display:flex;align-items:center;gap:10px;">
-          <div style="width:5px;height:2vh;background:#00dc6e;border-radius:1px;"></div>
+        <div style="padding:1.5vh 28px;background:rgba(0,220,110,0.06);border-bottom:1px solid rgba(0,220,110,0.1);display:flex;align-items:center;gap:10px;">
+          <div style="width:4px;height:1.8vh;background:#00dc6e;border-radius:1px;"></div>
           <span style="color:rgba(0,220,110,0.7);font-size:1.4vh;font-weight:700;letter-spacing:0.25em;">CANCHA 2</span>
         </div>
-        <div style="flex:1;display:flex;align-items:stretch;padding:2vh 40px 5vh;gap:16px;">
+        <div style="flex:1;display:flex;align-items:stretch;padding:1vh 32px 2vh;gap:12px;">
           <div id="m2-home" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;">
             <div class="logo-circle" id="m2-home-logo">?</div>
             <div id="m2-home-name" style="color:rgba(255,255,255,0.8);font-size:2.4vh;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;">EQUIPO C</div>
@@ -340,16 +308,7 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- FOOTER -->
-  <div style="
-    display:flex;align-items:center;justify-content:space-between;
-    padding:1.5vh 72px;border-top:1px solid rgba(255,255,255,0.05);
-    position:relative;z-index:1;
-  ">
-    <span style="color:rgba(255,255,255,0.18);font-size:1.2vh;letter-spacing:0.22em;font-weight:700;">MASSPORT507.COM</span>
-    <span style="color:rgba(255,255,255,0.18);font-size:1.2vh;letter-spacing:0.22em;font-weight:700;">@MASSPORT.PTY</span>
   </div>
 </div>
 
