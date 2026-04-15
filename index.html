@@ -275,7 +275,7 @@
           <div id="m1-home" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-around;">
             <div class="logo-circle" id="m1-home-logo">?</div>
             <div id="m1-home-name" style="color:rgba(255,255,255,0.8);font-size:2.4vh;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;">EQUIPO A</div>
-            <div id="m1-home-score" style="font-size:19vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
+            <div id="m1-home-score" style="font-size:16vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex-shrink:0;">
             <div style="flex:1;width:1px;background:rgba(255,255,255,0.06);"></div>
@@ -285,7 +285,7 @@
           <div id="m1-away" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-around;">
             <div class="logo-circle" id="m1-away-logo">?</div>
             <div id="m1-away-name" style="color:rgba(255,255,255,0.8);font-size:2.4vh;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;">EQUIPO B</div>
-            <div id="m1-away-score" style="font-size:19vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
+            <div id="m1-away-score" style="font-size:16vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
         </div>
       </div>
@@ -325,7 +325,7 @@
           <div id="m2-home" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-around;">
             <div class="logo-circle" id="m2-home-logo">?</div>
             <div id="m2-home-name" style="color:rgba(255,255,255,0.8);font-size:2.4vh;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;">EQUIPO C</div>
-            <div id="m2-home-score" style="font-size:19vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
+            <div id="m2-home-score" style="font-size:16vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex-shrink:0;">
             <div style="flex:1;width:1px;background:rgba(255,255,255,0.06);"></div>
@@ -335,7 +335,7 @@
           <div id="m2-away" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-around;">
             <div class="logo-circle" id="m2-away-logo">?</div>
             <div id="m2-away-name" style="color:rgba(255,255,255,0.8);font-size:2.4vh;font-weight:700;letter-spacing:0.06em;text-align:center;text-transform:uppercase;line-height:1.2;">EQUIPO D</div>
-            <div id="m2-away-score" style="font-size:19vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
+            <div id="m2-away-score" style="font-size:16vh;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums;transition:color 0.4s;">0</div>
           </div>
         </div>
       </div>
@@ -531,6 +531,7 @@ function showScreen(name) {
   });
   currentScreen = name;
   document.body.classList.toggle("show-cursor", name === "setup" || name === "welcome");
+  if (name === "game" || name === "transition") requestFullscreen();
 }
 
 function showTransition(nextIdx) {
