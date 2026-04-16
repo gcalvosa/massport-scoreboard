@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Control — Massport Business Cup 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    min-height: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* STATUS BAR */
+  #status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 12px; font-weight: 700; letter-spacing: 0.15em;
+  }
+  #conn-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #555; display: inline-block; margin-right: 8px;
+    transition: background 0.3s;
+  }
+  #conn-dot.connected { background: #00dc6e; box-shadow: 0 0 8px #00dc6e; }
+  #conn-dot.connecting { background: #f0a500; }
+
+  /* TANDA + TIMER */
+  #info-row {
+    display: flex; align-items: stretch; gap: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .info-block {
+    flex: 1; text-align: center; padding: 12px 8px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .info-block:last-child { border-right: none; }
+  .info-label {
+    color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.25em; margin-bottom: 4px;
+  }
+  .info-value {
+    font-size: 22px; font-weight: 900; letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+  #timer-val { color: #fff; }
+  #timer-val.overtime { color: #ff4444; }
+  #half-val { color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+  /* TIMER CONTROLS */
+  .section { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .section-title {
+    color: rgba(0,220,110,0.6); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.3em; margin-bottom: 10px;
+  }
+  .btn-row { display: flex; gap: 8px; }
+
+  /* BUTTONS */
+  .btn {
+    flex: 1; border: none; border-radius: 4px; cursor: pointer;
+    font-family: inherit; font-weight: 900; letter-spacing: 0.1em;
+    transition: all 0.1s; user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .btn:active { transform: scale(0.95); }
+
+  .btn-primary {
+    background: #00dc6e; color: #000;
+    padding: 16px 8px; font-size: 14px;
+  }
+  .btn-primary:active { background: #00ff80; }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.07); color: #fff;
+    padding: 14px 8px; font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .btn-secondary:active { background: rgba(255,255,255,0.14); }
+
+  .btn-danger {
+    background: rgba(255,68,68,0.12); color: #ff6666;
+    padding: 14px 8px; font-size: 13px;
+    border: 1px solid rgba(255,68,68,0.2);
+  }
+  .btn-danger:active { background: rgba(255,68,68,0.25); }
+
+  .btn-goal {
+    background: rgba(0,220,110,0.12); color: #00dc6e;
+    border: 1px solid rgba(0,220,110,0.25);
+    font-size: 24px; padding: 18px 8px;
+    flex: 1;
+  }
+  .btn-goal:active { background: rgba(0,220,110,0.25); }
+
+  .btn-minus {
+    background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.07);
+    font-size: 20px; padding: 12px 8px;
+    flex: 0 0 52px;
+  }
+  .btn-minus:active { background: rgba(255,255,255,0.1); }
+
+  /* MATCH CARDS */
+  .match-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 5px; overflow: hidden; margin-bottom: 10px;
+  }
+  .match-header {
+    background: rgba(0,220,110,0.06);
+    border-bottom: 1px solid rgba(0,220,110,0.1);
+    padding: 8px 14px;
+    color: rgba(0,220,110,0.7); font-size: 10px; font-weight: 700; letter-spacing: 0.25em;
+  }
+  .team-row {
+    display: flex; align-items: center;
+    padding: 10px 14px; gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .team-row:last-child { border-bottom: none; }
+  .team-name {
+    flex: 1; font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.8); text-transform: uppercase;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .team-score-display {
+    font-size: 28px; font-weight: 900; min-width: 36px; text-align: center;
+    font-variant-numeric: tabular-nums; color: #fff;
+  }
+  .team-btns { display: flex; gap: 6px; }
+
+  /* NAV */
+  .btn-nav {
+    background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 8px; font-size: 12px;
+    flex: 1;
+  }
+  .btn-nav:active { background: rgba(255,255,255,0.12); }
+  .btn-nav.active-nav {
+    background: rgba(0,220,110,0.1); color: #00dc6e;
+    border-color: rgba(0,220,110,0.25);
+  }
+</style>
+</head>
+<body>
+
+<!-- STATUS -->
+<div id="status-bar">
+  <div>
+    <span id="conn-dot" class="connecting"></span>
+    <span id="conn-label">Conectando...</span>
+  </div>
+  <div style="color:rgba(0,220,110,0.7);letter-spacing:0.1em;">MASSPORT 2026</div>
+</div>
+
+<!-- TIMER + INFO -->
+<div id="info-row">
+  <div class="info-block">
+    <div class="info-label">TANDA</div>
+    <div class="info-value" id="tanda-val">—</div>
+  </div>
+  <div class="info-block">
+    <div class="info-label">TIEMPO</div>
+    <div class="info-value" id="timer-val">--:--</div>
+    <div id="half-val">—</div>
+  </div>
+  <div class="info-block">
+    <div class="info-label">PANTALLA</div>
+    <div class="info-value" id="screen-val" style="font-size:13px;color:rgba(255,255,255,0.5);">—</div>
+  </div>
+</div>
+
+<!-- TIMER CONTROLS -->
+<div class="section">
+  <div class="section-title">CRONÓMETRO</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btn-toggle" onclick="send('toggle_timer')">▶ INICIAR</button>
+    <button class="btn btn-secondary" onclick="send('reset_timer')">⟳ RESET</button>
+    <button class="btn btn-secondary" onclick="send('switch_half')">⇄ TIEMPO</button>
+  </div>
+</div>
+
+<!-- MATCH 1 -->
+<div class="section">
+  <div class="section-title">CANCHA 1</div>
+  <div class="match-card">
+    <div class="team-row">
+      <div class="team-name" id="m1-home-name">EQUIPO A</div>
+      <div class="team-score-display" id="m1-home-score">0</div>
+      <div class="team-btns">
+        <button class="btn btn-minus" onclick="send('m1_home_minus')">−</button>
+        <button class="btn btn-goal" onclick="send('m1_home_plus')">+</button>
+      </div>
+    </div>
+    <div class="team-row">
+      <div class="team-name" id="m1-away-name">EQUIPO B</div>
+      <div class="team-score-display" id="m1-away-score">0</div>
+      <div class="team-btns">
+        <button class="btn btn-minus" onclick="send('m1_away_minus')">−</button>
+        <button class="btn btn-goal" onclick="send('m1_away_plus')">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MATCH 2 -->
+<div class="section">
+  <div class="section-title">CANCHA 2</div>
+  <div class="match-card">
+    <div class="team-row">
+      <div class="team-name" id="m2-home-name">EQUIPO C</div>
+      <div class="team-score-display" id="m2-home-score">0</div>
+      <div class="team-btns">
+        <button class="btn btn-minus" onclick="send('m2_home_minus')">−</button>
+        <button class="btn btn-goal" onclick="send('m2_home_plus')">+</button>
+      </div>
+    </div>
+    <div class="team-row">
+      <div class="team-name" id="m2-away-name">EQUIPO D</div>
+      <div class="team-score-display" id="m2-away-score">0</div>
+      <div class="team-btns">
+        <button class="btn btn-minus" onclick="send('m2_away_minus')">−</button>
+        <button class="btn btn-goal" onclick="send('m2_away_plus')">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVEGACIÓN -->
+<div class="section">
+  <div class="section-title">NAVEGACIÓN</div>
+  <div class="btn-row">
+    <button class="btn btn-nav" onclick="send('prev_tanda')">← TANDA ANT.</button>
+    <button class="btn btn-nav" onclick="send('go_game')">IR AL JUEGO</button>
+    <button class="btn btn-nav" onclick="send('next_tanda')">PRÓXIMA →</button>
+  </div>
+</div>
+
+<div style="height: 30px;"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let ws, reconnectTimer;
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${proto}//${location.host}/ws`);
+
+  ws.onopen = () => {
+    $('conn-dot').className = 'connected';
+    $('conn-label').textContent = 'Conectado';
+    ws.send(JSON.stringify({ type: 'identify', role: 'controller' }));
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'state') applyState(msg);
+    } catch {}
+  };
+
+  ws.onclose = () => {
+    $('conn-dot').className = 'connecting';
+    $('conn-label').textContent = 'Reconectando...';
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 3000);
+  };
+
+  ws.onerror = () => ws.close();
+}
+
+function send(action) {
+  if (ws && ws.readyState === 1) {
+    ws.send(JSON.stringify({ type: 'action', action }));
+  }
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const sec = (s % 60).toString().padStart(2, '0');
+  return `${m}:${sec}`;
+}
+
+function applyState(s) {
+  // Timer
+  $('timer-val').textContent = formatTime(s.seconds || 0);
+  $('timer-val').className = 'info-value' + (s.seconds >= 25 * 60 ? ' overtime' : '');
+  $('half-val').textContent = s.half === 2 ? 'SEGUNDO TIEMPO' : 'PRIMER TIEMPO';
+
+  // Tanda
+  $('tanda-val').textContent = `${(s.tanda || 0) + 1} / ${s.tandaTotal || 3}`;
+
+  // Screen
+  const screenNames = { welcome: 'INICIO', game: 'JUEGO', transition: 'TRANSICIÓN', setup: 'CONFIG' };
+  $('screen-val').textContent = screenNames[s.screen] || s.screen || '—';
+
+  // Toggle button label
+  $('btn-toggle').textContent = s.running ? '⏸ PAUSAR' : '▶ INICIAR';
+
+  // Scores
+  if (s.scores) {
+    $('m1-home-score').textContent = s.scores.m1Home ?? 0;
+    $('m1-away-score').textContent = s.scores.m1Away ?? 0;
+    $('m2-home-score').textContent = s.scores.m2Home ?? 0;
+    $('m2-away-score').textContent = s.scores.m2Away ?? 0;
+  }
+
+  // Team names
+  if (s.teams) {
+    $('m1-home-name').textContent = s.teams.m1Home || 'EQUIPO A';
+    $('m1-away-name').textContent = s.teams.m1Away || 'EQUIPO B';
+    $('m2-home-name').textContent = s.teams.m2Home || 'EQUIPO C';
+    $('m2-away-name').textContent = s.teams.m2Away || 'EQUIPO D';
+  }
+}
+
+connect();
+</script>
+</body>
+</html>

@@ -6,7 +6,11 @@
 <title>Massport Business Cup 2026 — Scoreboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
+  :root { --zoom: 1; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html {
+    zoom: var(--zoom);
+  }
   html, body {
     width: 100%; height: 100%;
     background: #000; overflow: hidden;
@@ -392,6 +396,7 @@
   <div style="margin-top:6px;"><span class="kbd">N</span> Siguiente tanda &nbsp; <span class="kbd">B</span> Tanda anterior</div>
   <div><span class="kbd">F</span> Pantalla completa &nbsp; <span class="kbd">ESC</span> Volver al inicio</div>
   <div><span class="kbd">K</span> Mostrar/ocultar esta ayuda</div>
+  <div><span class="kbd">+</span> Zoom in &nbsp; <span class="kbd">−</span> Zoom out</div>
 </div>
 
 <script>
@@ -771,6 +776,17 @@ document.addEventListener("keydown", e => {
     case "b": goPrevTanda(); break;
     case "f": toggleFullscreen(); break;
     case "k": $("kbd-hint").classList.toggle("visible"); break;
+    case "+":
+    case "=": {
+      const z = Math.min(2, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--zoom')) + 0.05);
+      document.documentElement.style.setProperty('--zoom', z.toFixed(2));
+      break;
+    }
+    case "-": {
+      const z = Math.max(0.3, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--zoom')) - 0.05);
+      document.documentElement.style.setProperty('--zoom', z.toFixed(2));
+      break;
+    }
   }
   if (e.key === "Escape") {
     exitFullscreenIfAny();
@@ -781,6 +797,112 @@ document.addEventListener("keydown", e => {
 // ══ INIT ══
 loadTanda(0);
 updateTimerUI();
+
+// ══ WEBSOCKET — control remoto ══
+(function () {
+  if (!location.host) return; // no correr desde file://
+
+  let ws, reconnectTimer;
+
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${proto}//${location.host}/ws`);
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: 'identify', role: 'display' }));
+      broadcastState();
+    };
+
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'action') {
+          handleRemoteAction(msg.action);
+        }
+      } catch {}
+    };
+
+    ws.onclose = () => {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = setTimeout(connect, 3000);
+    };
+
+    ws.onerror = () => ws.close();
+  }
+
+  function handleRemoteAction(action) {
+    switch (action) {
+      case 'toggle_timer': toggleTimer(); break;
+      case 'reset_timer':  resetTimer();  break;
+      case 'switch_half':  switchHalf();  break;
+      case 'm1_home_plus':  addScore('m1-home-score',  1); break;
+      case 'm1_home_minus': addScore('m1-home-score', -1); break;
+      case 'm1_away_plus':  addScore('m1-away-score',  1); break;
+      case 'm1_away_minus': addScore('m1-away-score', -1); break;
+      case 'm2_home_plus':  addScore('m2-home-score',  1); break;
+      case 'm2_home_minus': addScore('m2-home-score', -1); break;
+      case 'm2_away_plus':  addScore('m2-away-score',  1); break;
+      case 'm2_away_minus': addScore('m2-away-score', -1); break;
+      case 'next_tanda': goNextTanda(); break;
+      case 'prev_tanda': goPrevTanda(); break;
+      case 'go_game':
+        if (currentScreen === 'welcome') {
+          requestFullscreen();
+          loadTanda(currentTanda);
+          updateTimerUI();
+          showScreen('game');
+        }
+        break;
+    }
+    broadcastState();
+  }
+
+  function broadcastState() {
+    if (!ws || ws.readyState !== 1) return;
+    ws.send(JSON.stringify({
+      type: 'state',
+      screen: currentScreen,
+      tanda: currentTanda,
+      tandaTotal: TANDAS.length,
+      half: half,
+      seconds: seconds,
+      running: running,
+      scores: {
+        m1Home: parseInt($('m1-home-score').textContent) || 0,
+        m1Away: parseInt($('m1-away-score').textContent) || 0,
+        m2Home: parseInt($('m2-home-score').textContent) || 0,
+        m2Away: parseInt($('m2-away-score').textContent) || 0,
+      },
+      teams: {
+        m1Home: $('m1-home-name').textContent,
+        m1Away: $('m1-away-name').textContent,
+        m2Home: $('m2-home-name').textContent,
+        m2Away: $('m2-away-name').textContent,
+      }
+    }));
+  }
+
+  // Broadcast state every second while timer is running, and on key events
+  const origUpdateTimerUI = updateTimerUI;
+  window.updateTimerUI = function () {
+    origUpdateTimerUI();
+    broadcastState();
+  };
+
+  const origAddScore = addScore;
+  window.addScore = function (id, delta) {
+    origAddScore(id, delta);
+    broadcastState();
+  };
+
+  const origShowScreen = showScreen;
+  window.showScreen = function (name) {
+    origShowScreen(name);
+    broadcastState();
+  };
+
+  connect();
+})();
 </script>
 </body>
 </html>
